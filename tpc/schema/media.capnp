@@ -14,6 +14,11 @@ enum Player {
   flash @1;
 }
 
+struct Pod {
+  message @0 :Text;
+  pod @1 :Pod;
+}
+
 struct Image {
   uri @0 :Text;
   title @1 :Text;  
@@ -34,6 +39,7 @@ struct Media {
   person @8 :List(Text);
   player @9 :Player;
   copyright @10 :Text;
+  pods @11 :List(Pod);
 }
 
 struct MediaContent {

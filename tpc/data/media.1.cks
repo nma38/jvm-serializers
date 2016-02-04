@@ -12,6 +12,49 @@
 		Persons = ["Bill Gates", "Steve Jobs"]
 		Player = Java
 		Copyright = None
+		Pods = [
+            {
+                message = “root”
+                Pod = {
+                    message = “root-child”
+                    Pod ={
+                        message = "root-child2"
+                        Pod = {
+                            message = "root-child3"
+                            Pod = {
+                                message = "root-child4"
+                                Pod = {
+                                    message = "root-child5"
+                                    Pod = {
+                                        message = "root-child6"
+                                        Pod = {
+                                            message = "root-child7"
+                                            Pod = {
+                                                message = "root-child8"
+                                                Pod = {
+                                                    message = "root-child9"
+                                                    Pod = {
+                                                        message = "root-child10"
+                                                        Pod = None
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            {
+                message = "root2"
+                Pod = {
+                    message = "root2-child"
+                    Pod = None
+                }
+            }
+        ]
 	}
 
 	Images = [

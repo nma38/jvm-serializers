@@ -13,6 +13,11 @@ enum Player {
   FLASH = 1,
 }
 
+struct Pod {
+  1: string message,
+  2: optional Pod pod
+}
+
 /**
  * Some comment...
  */
@@ -36,6 +41,7 @@ struct Media {
   9: required list<string> person,
   10: required Player player,
   11: optional string copyright,
+  12: required list<Pod> pods,
 }
 
 struct MediaContent {

@@ -1,3 +1,8 @@
+def Pod = {
+    Name: String
+    Pod: Pod?
+}
+
 def Image = {
 	Uri: String
 	Title: String?
@@ -19,6 +24,7 @@ def Media = {
 	Persons: List(String)
 	Player: Player
 	Copyright: String?
+	Pods: List(Pod)
 
 	def Player = < Java, Flash >
 }

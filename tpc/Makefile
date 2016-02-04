@@ -37,8 +37,8 @@ dslplatform_compiler = java -jar lib/dsl-clc.jar
 dslplatform_dir = build/dslplatform
 
 # Default to 'no' because we might not have these tools available.
-Generate_protobuf ?= n
-Generate_thrift ?= n
+Generate_protobuf ?= y
+Generate_thrift ?= y
 Generate_capnp ?= y
 Generate_flatbuffers ?= y
 Generate_dslplatform ?= n # Requires Mono 3.10+
@@ -129,7 +129,7 @@ else ifneq ($(findstring .protostuff.proto,$(2)),)
 else ifneq ($(findstring .proto,$(2)),)
 	$(p1)$(protobuf_generator) --java_out=build/gen/$(2) $$<
 else ifneq ($(findstring .thrift,$(2)),)
-	$(p1)$(thrift_generator) -o build/gen/$(2) --gen java:hashcode,beans $$<jk
+	$(p1)$(thrift_generator) -o build/gen/$(2) --gen java:hashcode,beans $$<
 else ifneq ($(findstring .capnp,$(2)),)
 	$(p1)mkdir -p build/gen/$(2)/serializers/capnp/$(basename $(2))
 	$(p1)$(capnp_generator) compile -ojava:build/gen/$(2)/serializers/capnp/$(basename $(2)) $$<
