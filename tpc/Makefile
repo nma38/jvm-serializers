@@ -1,4 +1,3 @@
-##########################################################################
 
 -include Config.mk
 
@@ -26,6 +25,8 @@ mkcp = $(subst $(space),$(path_sep),$(1))
 
 protobuf_generator ?= protoc
 thrift_generator ?= thrift
+capnp_generator ?= capnp
+flatbuffers_generator ?= flatc
 activemqprotobuf_cp := $(call mkcp,$(wildcard lib/activemq-*.jar))
 activemqprotobuf_generator ?= java -cp "$(activemqprotobuf_cp)" org.apache.activemq.protobuf.compiler.AltJavaGenerator
 cks_generator ?= java -jar lib/cks-tool.jar
@@ -38,6 +39,8 @@ dslplatform_dir = build/dslplatform
 # Default to 'no' because we might not have these tools available.
 Generate_protobuf ?= n
 Generate_thrift ?= n
+Generate_capnp ?= y
+Generate_flatbuffers ?= y
 Generate_dslplatform ?= n # Requires Mono 3.10+
 
 # Default to 'yes' because the generator tools are included in 'lib/'.
@@ -65,7 +68,7 @@ endif
 
 ##########################################################################
 
-SchemaExtensions := .thrift .proto .tcks .avro .dsl
+SchemaExtensions := .fbs .capnp .thrift .proto .tcks .avro .dsl
 Schemas = $(patsubst schema/%,%,$(wildcard $(SchemaExtensions:%=schema/*%)))
 
 ##########################################################################
@@ -99,6 +102,10 @@ else ifneq ($(findstring .avro,$(2)),)
 	NeedToGenerate_$(1) := $(Generate_avro)
 else ifneq ($(findstring .dsl,$(2)),)
 	NeedToGenerate_$(1) := $(Generate_dslplatform)
+else ifneq ($(findstring .capnp,$(2)),)
+	NeedToGenerate_$(1) := $(Generate_capnp)
+else ifneq ($(findstring .fbs,$(2)),)
+	NeedToGenerate_$(1) := $(Generate_flatbuffers)
 else
 endif
 
@@ -122,7 +129,12 @@ else ifneq ($(findstring .protostuff.proto,$(2)),)
 else ifneq ($(findstring .proto,$(2)),)
 	$(p1)$(protobuf_generator) --java_out=build/gen/$(2) $$<
 else ifneq ($(findstring .thrift,$(2)),)
-	$(p1)$(thrift_generator) -o build/gen/$(2) --gen java:hashcode,beans $$<
+	$(p1)$(thrift_generator) -o build/gen/$(2) --gen java:hashcode,beans $$<jk
+else ifneq ($(findstring .capnp,$(2)),)
+	$(p1)mkdir -p build/gen/$(2)/serializers/capnp/$(basename $(2))
+	$(p1)$(capnp_generator) compile -ojava:build/gen/$(2)/serializers/capnp/$(basename $(2)) $$<
+else ifneq ($(findstring .fbs,$(2)),)
+	$(p1)$(flatbuffers_generator) -o build/gen/$(2) -j $$<
 else ifneq ($(findstring .tcks,$(2)),)
 	$(p1)$(cks_generator) gen-java $$< serializers.cks.$(basename $(2)) build/gen/$(2)/serializers/cks/$(basename $(2))
 else ifneq ($(findstring .avro,$(2)),)

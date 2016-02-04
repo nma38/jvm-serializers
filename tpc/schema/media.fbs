@@ -1,0 +1,40 @@
+namespace serializer.flatbuffers.media;
+
+enum Size : byte {
+  SMALL = 1,
+  LARGE
+}
+
+enum Player : byte {
+  JAVA = 1,
+  FLASH
+}
+
+table Image {
+  uri:string;
+  title:string;  
+  width:int;
+  height:int; 
+  size:Size = 1;
+}
+
+table Media {
+  uri:string;
+  title:string;
+  width:int;
+  height:int;
+  format:string (required);
+  duration:long;
+  size:long;
+  bitrate:int;
+  person:[string] (required);
+  player:Player = 1;
+  copyright:string;
+}
+
+table MediaContent {
+  image:[Image] (required);
+  media:Media (required);
+}
+
+root_type MediaContent;

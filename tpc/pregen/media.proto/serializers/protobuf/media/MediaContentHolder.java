@@ -40,7 +40,7 @@ public final class MediaContentHolder {
       SMALL(0, 0),
       LARGE(1, 1),
       ;
-      
+
       
       public final int getNumber() { return value; }
       
