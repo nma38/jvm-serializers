@@ -1,17 +1,10 @@
 package serializers;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import data.media.*;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
-
-import data.media.Image;
-import data.media.Media;
-import data.media.MediaContent;
-import data.media.MediaTransformer;
 
 public class JavaBuiltIn
 {
@@ -111,7 +104,7 @@ public class JavaBuiltIn
 
 		private Media copy(Media m)
 		{
-			return new Media(m.uri, m.title, m.width, m.height, m.format, m.duration, m.size, m.bitrate, m.hasBitrate, new ArrayList<String>(m.persons), m.player, m.copyright);
+			return new Media(m.uri, m.title, m.width, m.height, m.format, m.duration, m.size, m.bitrate, m.hasBitrate, new ArrayList<String>(m.persons), m.player, m.copyright, new ArrayList<Pod>(m.pods));
 		}
 
 		public MediaContent shallowReverse(MediaContent mc)

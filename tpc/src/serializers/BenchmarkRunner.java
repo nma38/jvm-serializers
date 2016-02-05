@@ -6,7 +6,6 @@ import serializers.flatbuffers.Flatbuffers;
 import serializers.jackson.JacksonJsonDatabind;
 import serializers.jackson.JacksonJsonManual;
 import serializers.protobuf.Protobuf;
-import serializers.protobuf.ProtobufJson;
 
 /**
  * Full test of various codecs, using a single <code>MediaItem</code>
@@ -69,7 +68,6 @@ public class BenchmarkRunner extends MediaItemBenchmark
         //JsonTwoLattes.register(groups);
         //ProtostuffJson.register(groups);
 
-        ProtobufJson.register(groups);
         //JsonGsonManual.register(groups);
         //JsonGsonTree.register(groups);
         //JsonGsonDatabind.register(groups);

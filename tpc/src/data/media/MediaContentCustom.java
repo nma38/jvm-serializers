@@ -68,7 +68,36 @@ public class MediaContentCustom {
 		Media.Player player = Media.Player.values()[in.readByte()];
 		String copyright = readMaybeString(in);
 
-		return new Media(uri, title, width, height, format, duration, size, bitrate, hasBitrate, persons, player, copyright);
+		int numPods = in.readInt();
+		ArrayList<Pod> pods = new ArrayList<>(numPods);
+		for (int i = 0; i < numPods; i++) {
+			pods.add(readPod(in));
+		}
+
+		return new Media(uri, title, width, height, format, duration, size, bitrate, hasBitrate, persons, player, copyright, pods);
+	}
+
+
+	private static Pod readPod(ObjectInputStream in) throws IOException {
+
+		String message = in.readUTF();
+		boolean hasPod = in.readBoolean();
+		if (hasPod) {
+			return new Pod(message, readPod(in));
+		} else {
+			return new Pod(message, null);
+		}
+	}
+
+
+	private static void writePod(ObjectOutputStream out, Pod p) throws IOException {
+		out.writeUTF(p.getMessage());
+		if (p.getPod() != null) {
+			out.writeBoolean(true);
+			writePod(out, p.getPod());
+		} else {
+			out.writeBoolean(false);
+		}
 	}
 
 	private static void writeMedia(ObjectOutputStream out, Media m) throws IOException {
@@ -86,7 +115,12 @@ public class MediaContentCustom {
 		}
 		out.writeByte(m.getPlayer().ordinal());
 		writeMaybeString(out, m.getCopyright());
+		out.writeInt(m.getPods().size());
+		for (Pod p : m.getPods()) {
+			writePod(out, p);
+		}
 	}
+
 
 	// Image
 

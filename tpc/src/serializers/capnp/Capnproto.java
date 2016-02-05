@@ -154,6 +154,12 @@ public class Capnproto {
                 personBuilder.set(i, new Text.Reader(media.getPersons().get(i)));
             }
 
+            StructList.Builder<MediaContentHolder.Pod.Builder> podListBuilder = mediaBuilder.initPods(media.getPods().size());
+            for (int i = 0; i < media.getPods().size(); i ++) {
+                MediaContentHolder.Pod.Builder podBuilder = podListBuilder.get(i);
+                forwardPod(media.getPods().get(i), podBuilder);
+            }
+
             mediaBuilder.setBitrate(media.getBitrate());
             mediaBuilder.setDuration(media.getDuration());
             if (media.getFormat() != null) {
@@ -175,6 +181,15 @@ public class Capnproto {
 
             if (media.getUri() != null) {
                 mediaBuilder.setUri(media.getUri());
+            }
+        }
+
+        private void forwardPod( data.media.Pod pod,  MediaContentHolder.Pod.Builder podBuilder) {
+            podBuilder.setMessage(new Text.Reader(pod.getMessage()));
+            if (pod.getPod() != null) {
+                MediaContentHolder.Pod.Builder innerBuilder = podBuilder.initPod();
+                forwardPod(pod, innerBuilder);
+                podBuilder.setPod(innerBuilder.asReader());
             }
         }
 
@@ -206,6 +221,14 @@ public class Capnproto {
             while (personIt.hasNext()) {
                 personsList.add(personIt.next().toString());
             }
+
+            ArrayList<data.media.Pod> podsList = new ArrayList<>();
+            Iterator<MediaContentHolder.Pod.Reader> podIt = media.getPods().iterator();
+
+            while (podIt.hasNext()) {
+                podsList.add(reversePod(podIt.next()));
+            }
+
             // Media
             return new data.media.Media(
                     media.hasUri()? media.getUri().toString() : null,
@@ -219,7 +242,17 @@ public class Capnproto {
                     media.getBitrate() > 1 ? true:false,
                     personsList,
                     reversePlayer(media.getPlayer()),
-                    media.hasCopyright() ? media.getCopyright().toString() : null
+                    media.hasCopyright() ? media.getCopyright().toString() : null,
+                    podsList
+            );
+        }
+
+        private data.media.Pod reversePod(MediaContentHolder.Pod.Reader pod) {
+            MediaContentHolder.Pod.Reader innerPod = pod.getPod();
+
+            return new data.media.Pod(
+                    pod.getMessage().toString(),
+                    innerPod != null ? reversePod(innerPod) : null
             );
         }
 

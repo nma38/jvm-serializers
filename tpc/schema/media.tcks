@@ -1,6 +1,6 @@
 def Pod = {
-    Name: String
-    Pod: Pod?
+    Message: String
+    Pod: Pod
 }
 
 def Image = {

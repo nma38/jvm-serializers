@@ -2,8 +2,8 @@ package serializers.flatbuffers;
 
 import com.google.flatbuffers.FlatBufferBuilder;
 import data.media.MediaTransformer;
-import serializers.flatbuffers.media.*;
 import serializers.*;
+import serializers.flatbuffers.media.*;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -122,6 +122,11 @@ public class Flatbuffers {
             for (int i = 0; i < media.persons.size(); i++) {
                 personVectorOffsets[i] = builder.createString(media.persons.get(i));
             }
+
+            int[] podVectorOffsets = new int[media.pods.size()];
+            for (int i = 0; i < media.pods.size(); i++) {
+                podVectorOffsets[i] = forwardPod(media.pods.get(i), builder);
+            }
             // Media
             int mediaOffset = Media.createMedia(builder,
                     builder.createString(media.uri),
@@ -134,9 +139,20 @@ public class Flatbuffers {
                     media.bitrate,
                     Media.createPersonVector(builder, personVectorOffsets),
                     forwardPlayer(media.player),
-                    media.copyright != null ? builder.createString(media.copyright) : builder.createString(ByteBuffer.allocate(0))
+                    media.copyright != null ? builder.createString(media.copyright) : builder.createString(ByteBuffer.allocate(0)),
+                    Media.createPodsVector(builder, podVectorOffsets)
             );
             return mediaOffset;
+        }
+
+        private int forwardPod(data.media.Pod pod, FlatBufferBuilder builder)
+        {
+            Pod.startPod(builder);
+            if (pod != null) {
+                Pod.addPod(builder, forwardPod(pod.getPod(), builder));
+            }
+            Pod.addMessage(builder, builder.createString(pod.getMessage()));
+            return Pod.endPod(builder);
         }
 
         public Byte forwardPlayer(data.media.Media.Player p)
@@ -194,6 +210,11 @@ public class Flatbuffers {
             for (int i = 0; i < media.personLength(); i++) {
                 persons.add(media.person(i));
             }
+
+            ArrayList<data.media.Pod> pods = new ArrayList<>();
+            for (int i = 0; i < media.personLength(); i++) {
+                pods.add(reversePod(media.pods(i)));
+            }
             // Media
             return new data.media.Media(
                     media.uri(),
@@ -207,7 +228,15 @@ public class Flatbuffers {
                     media.bitrate() > 1 ? true:false,
                     persons,
                     reversePlayer(media.player()),
-                    media.copyright().isEmpty() ? null : media.copyright()
+                    media.copyright().isEmpty() ? null : media.copyright(),
+                    pods
+            );
+        }
+
+        private data.media.Pod reversePod(Pod pod) {
+            return new data.media.Pod(
+                    pod.message(),
+                    pod.pod() != null ? reversePod(pod) : null
             );
         }
 

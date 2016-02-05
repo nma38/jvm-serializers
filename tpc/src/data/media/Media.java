@@ -44,9 +44,11 @@ public class Media implements java.io.Serializable {
 
 	public String copyright;    // Can be unset.
 
+	public List<Pod> pods;
+
 	public Media() {}
 
-	public Media(String uri, String title, int width, int height, String format, long duration, long size, int bitrate, boolean hasBitrate, List<String> persons, Player player, String copyright)
+	public Media(String uri, String title, int width, int height, String format, long duration, long size, int bitrate, boolean hasBitrate, List<String> persons, Player player, String copyright, List<Pod> pods)
 	{
 		this.uri = uri;
 		this.title = title;
@@ -60,6 +62,7 @@ public class Media implements java.io.Serializable {
 		this.persons = persons;
 		this.player = player;
 		this.copyright = copyright;
+		this.pods = pods;
 	}
 
 	@Override
@@ -82,6 +85,7 @@ public class Media implements java.io.Serializable {
 		if (player != media.player) return false;
 		if (title != null ? !title.equals(media.title) : media.title != null) return false;
 		if (uri != null ? !uri.equals(media.uri) : media.uri != null) return false;
+		if (pods != null ? !pods.equals(media.pods) : media.pods != null) return false;
 
 		return true;
 	}
@@ -101,6 +105,7 @@ public class Media implements java.io.Serializable {
 		result = 31 * result + (persons != null ? persons.hashCode() : 0);
 		result = 31 * result + (player != null ? player.hashCode() : 0);
 		result = 31 * result + (copyright != null ? copyright.hashCode() : 0);
+		result = 31 * result + (pods != null ? pods.hashCode() : 0);
 		return result;
 	}
 
@@ -119,6 +124,7 @@ public class Media implements java.io.Serializable {
 		sb.append(", persons=").append(repr(persons));
 		sb.append(", player=").append(player);
 		sb.append(", copyright=").append(repr(copyright));
+		sb.append(", pods=").append(pods);
 		sb.append("]");
 		return sb.toString();
 	}
@@ -211,4 +217,8 @@ public class Media implements java.io.Serializable {
     public String getCopyright() {
         return copyright;
     }
+
+	public List<Pod> getPods() { return pods;}
+
+	public void setPods(List<Pod> pods) { this.pods = pods; }
 }

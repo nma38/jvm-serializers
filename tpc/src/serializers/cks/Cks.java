@@ -1,13 +1,15 @@
 package serializers.cks;
 
 import cks.value.data.Maybe;
-import serializers.cks.media.*;
+import data.media.MediaTransformer;
+import serializers.cks.media.Image;
+import serializers.cks.media.Media;
+import serializers.cks.media.MediaContent;
+import serializers.cks.media.Pod;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import data.media.MediaTransformer;
 
 public class Cks
 {
@@ -32,8 +34,21 @@ public class Cks
 			return new MediaContent(images, forwardMedia(mc.media));
 		}
 
+		private Pod forwardPod(data.media.Pod pod) {
+
+			return new Pod(
+					pod.getMessage(),
+					pod.getPod() != null ? forwardPod(pod.getPod()) : null
+			);
+		}
+
 		private Media forwardMedia(data.media.Media media)
 		{
+			ArrayList<Pod> pods = new ArrayList<>();
+			for (data.media.Pod pod : media.getPods()) {
+				pods.add(forwardPod(pod));
+			}
+
 			return new Media(
 				media.uri,
 				media.title != null ? Maybe.Just(media.title) : Maybe.<String>Nothing(),
@@ -45,7 +60,8 @@ public class Cks
 				media.hasBitrate ? Maybe.Just(media.bitrate) : Maybe.<Integer>Nothing(),
 				new ArrayList<String>(media.persons),
 				forwardPlayer(media.player),
-				media.copyright != null ? Maybe.Just(media.copyright) : Maybe.<String>Nothing()
+				media.copyright != null ? Maybe.Just(media.copyright) : Maybe.<String>Nothing(),
+				pods
 			);
 		}
 
@@ -96,6 +112,11 @@ public class Cks
 
 		private data.media.Media reverseMedia(Media media)
 		{
+            ArrayList<data.media.Pod> pods = new ArrayList<>();
+            for (Pod pod : media.pods) {
+                pods.add(reversePod(pod));
+            }
+
 			// Media
 			return new data.media.Media(
 				media.uri,
@@ -109,7 +130,8 @@ public class Cks
 				media.bitrate.isJust(),
 				new ArrayList<String>(media.persons),
 				reversePlayer(media.player),
-				media.copyright.get(null)
+				media.copyright.get(null),
+                pods
 			);
 		}
 
@@ -128,6 +150,13 @@ public class Cks
 				image.width,
 				image.height,
 				reverseSize(image.size));
+		}
+
+		private data.media.Pod reversePod(Pod pod) {
+			return new data.media.Pod(
+                    pod.message,
+                    pod.pod != null ? reversePod(pod) : null
+			);
 		}
 
 		public data.media.Image.Size reverseSize(Image.Size s)

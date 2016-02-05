@@ -1,15 +1,12 @@
 package serializers;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
+import data.media.Image;
+import data.media.Media;
+import data.media.MediaContent;
+import data.media.Pod;
 
-import data.media.*;
+import java.io.*;
+import java.util.ArrayList;
 
 public final class JavaManual
 {
@@ -112,10 +109,15 @@ public final class JavaManual
 			}
 			Media.Player player = Media.Player.values()[in.readByte()];
 			String copyright = readMaybeString(in);
+			int numPods = in.readInt();
+			ArrayList<Pod> pods = new ArrayList<>(numPods);
+			for (int i = 0; i < numPods; i++) {
+				pods.add(readPod(in));
+			}
 
 			return new Media(
 				uri, title, width, height, format, duration, size,
-				bitrate, hasBitrate, persons, player, copyright);
+				bitrate, hasBitrate, persons, player, copyright, pods);
 		}
 
 		private static void writeMedia(DataOutputStream out, Media m)
@@ -135,6 +137,32 @@ public final class JavaManual
 			}
 			out.writeByte(m.player.ordinal());
 			writeMaybeString(out, m.copyright);
+			out.writeInt(m.getPods().size());
+			for (Pod p : m.getPods()) {
+				writePod(out, p);
+			}
+		}
+
+
+		private static Pod readPod(DataInputStream in) throws IOException {
+
+			String message = in.readUTF();
+			boolean hasPod = in.readBoolean();
+			if (hasPod) {
+				return new Pod(message, readPod(in));
+			} else {
+				return new Pod(message, null);
+			}
+		}
+
+		private static void writePod(DataOutputStream out, Pod p) throws IOException {
+			out.writeUTF(p.getMessage());
+			if (p.getPod() != null) {
+				out.writeBoolean(true);
+				writePod(out, p.getPod());
+			} else {
+				out.writeBoolean(false);
+			}
 		}
 
 		// Image

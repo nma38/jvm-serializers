@@ -1,16 +1,21 @@
 package serializers.jackson;
 
-import data.media.*;
-import static data.media.FieldMapping.*;
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.io.SerializedString;
+import data.media.Image;
+import data.media.Media;
+import data.media.MediaContent;
+import data.media.Pod;
+import serializers.*;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.core.io.SerializedString;
-
-import serializers.*;
+import static data.media.FieldMapping.*;
 
 /**
  * "Hand-written" version of Jackson-based codec. Not optimized for compactness,
@@ -33,6 +38,9 @@ public class JacksonJsonManual extends BaseJacksonDriver<MediaContent>
     protected final static SerializedString FIELD_BITRATE = new SerializedString(FULL_FIELD_NAME_BITRATE);
     protected final static SerializedString FIELD_COPYRIGHT = new SerializedString(FULL_FIELD_NAME_COPYRIGHT);
     protected final static SerializedString FIELD_PERSONS = new SerializedString(FULL_FIELD_NAME_PERSONS);
+    protected final static SerializedString FIELD_PODS = new SerializedString(FULL_FIELD_NAME_PODS);
+    protected final static SerializedString FIELD_MESSAGE = new SerializedString(FULL_FIELD_NAME_MESSAGE);
+    protected final static SerializedString FIELD_POD = new SerializedString(FULL_FIELD_NAME_POD);
     
     public static void register(TestGroups groups)
     {
@@ -163,7 +171,22 @@ public class JacksonJsonManual extends BaseJacksonDriver<MediaContent>
         for (String person : media.persons) {
             generator.writeString(person);
         }
+        generator.writeFieldName(FIELD_PODS);
+        for (Pod pod : media.pods) {
+            writePod(generator, pod);
+        }
         generator.writeEndArray();
+        generator.writeEndObject();
+    }
+
+    private void writePod(JsonGenerator generator, Pod pod) throws IOException {
+        generator.writeStartObject();
+        generator.writeFieldName(FIELD_MESSAGE);
+        generator.writeString(pod.getMessage());
+        generator.writeFieldName(FIELD_POD);
+        if (pod.getPod() != null) {
+            writePod(generator, pod.getPod());
+        }
         generator.writeEndObject();
     }
 
@@ -269,9 +292,12 @@ public class JacksonJsonManual extends BaseJacksonDriver<MediaContent>
                                                 media.copyright = parser.nextTextValue();
                                                 if (parser.nextFieldName(FIELD_PERSONS)) {
                                                     media.persons = readPersons(parser);
-                                                    parser.nextToken();
-                                                    verifyCurrent(parser, JsonToken.END_OBJECT);
-                                                    return media;
+                                                    if (parser.nextFieldName(FIELD_PODS)) {
+                                                        media.pods = readPods(parser);
+                                                        parser.nextToken();
+                                                        verifyCurrent(parser, JsonToken.END_OBJECT);
+                                                        return media;
+                                                    }
                                                 }
                                             }
                                         }
@@ -329,6 +355,8 @@ public class JacksonJsonManual extends BaseJacksonDriver<MediaContent>
                 case FIELD_IX_COPYRIGHT:
                     media.copyright = parser.nextTextValue();
                     continue;
+                    case FIELD_IX_PODS:
+                        media.pods = readPods(parser);
                 }
             }
             throw new IllegalStateException("Unexpected field '"+field+"'");
@@ -343,8 +371,58 @@ public class JacksonJsonManual extends BaseJacksonDriver<MediaContent>
         if (!haveSize) throw new IllegalStateException("Missing field: " + FIELD_SIZE);
         if (media.persons == null) media.persons = new ArrayList<String>();
         if (media.player == null) throw new IllegalStateException("Missing field: " + FIELD_PLAYER);
+        if (media.pods == null) media.pods = new ArrayList<Pod>();
         
         return media;
+    }
+
+    private List<Pod> readPods(JsonParser parser) throws IOException
+    {
+        if (parser.nextToken() != JsonToken.START_ARRAY) {
+            reportIllegal(parser, JsonToken.START_ARRAY);
+        }
+        List<Pod> pods = new ArrayList<>();
+        while (parser.nextToken() == JsonToken.START_OBJECT) {
+            pods.add(readPod(parser));
+        }
+        verifyCurrent(parser, JsonToken.END_ARRAY);
+        return pods;
+    }
+
+    private Pod readPod(JsonParser parser) throws IOException {
+        Pod pod = new Pod();
+        if (parser.nextFieldName(FIELD_MESSAGE)) {
+            pod.message = parser.nextTextValue();
+            if (parser.nextFieldName(FIELD_POD)) {
+                pod.pod = parser.getCurrentToken() != JsonToken.VALUE_NULL ? readPod(parser) : null;
+                parser.nextToken();
+                verifyCurrent(parser, JsonToken.END_OBJECT);
+                return pod;
+            }
+        }
+
+        for (; parser.getCurrentToken() == JsonToken.FIELD_NAME; parser.nextToken()) {
+            String field = parser.getCurrentName();
+            // read value token (or START_ARRAY)
+            parser.nextToken();
+            Integer I = fullFieldToIndex.get(field);
+            if (I != null) {
+                switch (I) {
+                    case FIELD_IX_MESSAGE:
+                        pod.message = parser.getText();
+                        continue;
+                    case FIELD_IX_POD:
+                        pod.pod = parser.getCurrentToken() != JsonToken.VALUE_NULL ? readPod(parser) : null;
+                        continue;
+                }
+            }
+            throw new IllegalStateException("Unexpected field '"+field+"'");
+        }
+
+        if (pod.message == null) throw new IllegalStateException("Missing field: " + FIELD_MESSAGE);
+
+        verifyCurrent(parser, JsonToken.END_OBJECT);
+        return pod;
     }
 
     private List<Image> readImages(JsonParser parser) throws IOException

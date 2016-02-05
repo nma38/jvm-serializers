@@ -1,15 +1,13 @@
 package serializers;
 
+import serializers.cks.CksText;
+import serializers.jackson.JacksonJsonDatabind;
+import serializers.jackson.JacksonJsonManual;
+import serializers.protobuf.Protobuf;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
-
-import serializers.avro.AvroSpecific;
-import serializers.cks.CksText;
-import serializers.jackson.*;
-import serializers.kryo.Kryo;
-import serializers.protobuf.Protobuf;
-import serializers.xml.XmlStax;
 
 /**
  * Alternative benchmark which uses a sequence of data items for testing,
@@ -33,33 +31,24 @@ public class MediaStreamBenchmark extends BenchmarkBase
     {        
         // Binary Formats; language-specific ones
         JavaManual.register(groups);
-        Hessian.register(groups);
-        Kryo.register(groups);
-        FastSerialization.register(groups);
-        JBossSerialization.register(groups);
-        JBossMarshalling.register(groups);
+        //Hessian.register(groups);
+        //FastSerialization.register(groups);
 
         // Binary formats, generic: protobuf, thrift, avro, CKS, msgpack
         Protobuf.register(groups);
         Thrift.register(groups);
-        AvroSpecific.register(groups);
- 
+
         // JSON
         JacksonJsonManual.register(groups);
         JacksonJsonDatabind.register(groups);
-        JacksonWithAfterburner.registerJSON(groups); // databind with bytecode generation (faster)
 
         // JSON-like
         // share both names & values for data streams:
-        JacksonSmileManual.register(groups, true, true);
-        JacksonSmileDatabind.register(groups, true, true);
-        JacksonWithAfterburner.registerSmile(groups, true, true);
 
         // this one needed to read in test data, too:
         CksText.register(groups);
         
         // XML (only fastest codecs)
-        XmlStax.register(groups, false, true, true); // skip woodstox, include aalto and fast-infoset
     }
 
     @Override

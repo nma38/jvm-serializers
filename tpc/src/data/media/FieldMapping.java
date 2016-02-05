@@ -30,6 +30,13 @@ public final class FieldMapping
 	public final static String FULL_FIELD_NAME_PERSONS = "persons";
 	public final static int FIELD_IX_COPYRIGHT = 13;
 	public final static String FULL_FIELD_NAME_COPYRIGHT = "copyright";
+	public final static int FIELD_IX_PODS = 14;
+	public final static String FULL_FIELD_NAME_PODS = "pods";
+	public final static int FIELD_IX_MESSAGE = 15;
+	public final static String FULL_FIELD_NAME_MESSAGE = "message";
+	public final static int FIELD_IX_POD = 16;
+	public final static String FULL_FIELD_NAME_POD = "message";
+
 
         // 25-Jun-2011, tatu: Some earlier tests used minimal names; not in use any more
         /*
@@ -81,5 +88,9 @@ public final class FieldMapping
 		fullFieldToIndex.put(FULL_FIELD_NAME_BITRATE, FIELD_IX_BITRATE);
 		fullFieldToIndex.put(FULL_FIELD_NAME_PERSONS, FIELD_IX_PERSONS);
 		fullFieldToIndex.put(FULL_FIELD_NAME_COPYRIGHT, FIELD_IX_COPYRIGHT);
+		fullFieldToIndex.put(FULL_FIELD_NAME_PODS, FIELD_IX_PODS);
+		fullFieldToIndex.put(FULL_FIELD_NAME_MESSAGE, FIELD_IX_MESSAGE);
+		fullFieldToIndex.put(FULL_FIELD_NAME_POD, FIELD_IX_POD);
+
 	}
 }
