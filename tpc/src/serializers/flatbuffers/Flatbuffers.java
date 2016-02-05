@@ -1,8 +1,8 @@
-package serializers.fbs;
+package serializers.flatbuffers;
 
 import com.google.flatbuffers.FlatBufferBuilder;
 import data.media.MediaTransformer;
-import serializer.flatbuffers.media.*;
+import serializers.flatbuffers.media.*;
 import serializers.*;
 
 import java.io.*;
@@ -33,12 +33,13 @@ public class Flatbuffers {
 
         @Override
         public MediaContent deserialize (byte[] array) throws Exception {
-            return MediaContent.getRootAsMediaContent(ByteBuffer.wrap(array));
+            ByteBuffer bb = ByteBuffer.wrap(array);
+            return MediaContent.getRootAsMediaContent(bb);
         }
 
         @Override
-        public byte[] serialize(MediaContent content) {
-            return content.getByteBuffer().array();
+        public byte[] serialize(MediaContent content) throws IOException {
+            return content.getByteBuffer().compact().array();
         }
 
         @Override
@@ -63,6 +64,7 @@ public class Flatbuffers {
                 int len = in.readInt();
                 byte[] data = new byte[len];
                 in.readFully(data);
+                in.close();
                 result[i] = deserialize(data);
             }
             return result;
@@ -94,14 +96,23 @@ public class Flatbuffers {
         public MediaContent forward(data.media.MediaContent mc)
         {
             FlatBufferBuilder builder = new FlatBufferBuilder();
+
+            // Media
             int mediaOffset = forwardMedia(mc.getMedia(), builder);
+
             int[] imageOffsets = new int[mc.images.size()];
             for (int i = 0; i < mc.images.size(); i++) {
                 imageOffsets[i] = forwardImage(mc.images.get(i), builder);
             }
 
-            int rootTableOffset = MediaContent.createMediaContent(builder, MediaContent.createImageVector(builder, imageOffsets), mediaOffset);
-            builder.finish(rootTableOffset);
+            int imageOffset = MediaContent.createImageVector(builder, imageOffsets);
+
+            MediaContent.startMediaContent(builder);
+            MediaContent.addMedia(builder, mediaOffset);
+            MediaContent.addImage(builder, imageOffset);
+            int rootTableOffset = MediaContent.endMediaContent(builder);
+
+            MediaContent.finishMediaContentBuffer(builder, rootTableOffset);
             return MediaContent.getRootAsMediaContent(builder.dataBuffer());
         }
 
@@ -114,7 +125,7 @@ public class Flatbuffers {
             // Media
             int mediaOffset = Media.createMedia(builder,
                     builder.createString(media.uri),
-                    media.title != null ? builder.createString(media.title) : builder.createString(""),
+                    media.title != null ? builder.createString(media.title) : builder.createString(ByteBuffer.allocate(0)),
                     media.width,
                     media.height,
                     builder.createString(media.format),
@@ -123,7 +134,7 @@ public class Flatbuffers {
                     media.bitrate,
                     Media.createPersonVector(builder, personVectorOffsets),
                     forwardPlayer(media.player),
-                    media.copyright != null ? builder.createString(media.copyright) : builder.createString("")
+                    media.copyright != null ? builder.createString(media.copyright) : builder.createString(ByteBuffer.allocate(0))
             );
             return mediaOffset;
         }
@@ -142,7 +153,7 @@ public class Flatbuffers {
         {
             int imageOffset = Image.createImage(builder,
                     builder.createString(image.uri),
-                    image.title != null ? builder.createString(image.title) : builder.createString(""),
+                    image.title != null ? builder.createString(image.title) : builder.createString(ByteBuffer.allocate(0)),
                     image.width,
                     image.height,
                     forwardSize(image.size)
@@ -173,10 +184,6 @@ public class Flatbuffers {
                 images.add(reverseImage(mc.image(i)));
             }
 
-            if (mc.media() == null) {
-                throw new RuntimeException();
-            }
-
             data.media.Media media = reverseMedia(mc.media());
             return new data.media.MediaContent(media, images);
         }
@@ -190,7 +197,7 @@ public class Flatbuffers {
             // Media
             return new data.media.Media(
                     media.uri(),
-                    media.title(),
+                    media.title().isEmpty() ? null : media.title(),
                     media.width(),
                     media.height(),
                     media.format(),
@@ -200,7 +207,7 @@ public class Flatbuffers {
                     media.bitrate() > 1 ? true:false,
                     persons,
                     reversePlayer(media.player()),
-                    media.copyright()
+                    media.copyright().isEmpty() ? null : media.copyright()
             );
         }
 
@@ -215,7 +222,7 @@ public class Flatbuffers {
         {
             return new data.media.Image(
                     image.uri(),
-                    image.title(),
+                    image.title().isEmpty() ? null : image.title(),
                     image.width(),
                     image.height(),
                     reverseSize(image.size()));

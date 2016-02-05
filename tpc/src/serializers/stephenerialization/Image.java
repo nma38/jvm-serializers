@@ -1,14 +1,12 @@
 package serializers.stephenerialization;
 
-import static data.ReprUtil.repr;
+import com.enragedginger.stephenerialization.annotations.Stephenerializable;
+import com.enragedginger.stephenerialization.annotations.Stephenerialize;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import com.enragedginger.stephenerialization.StephenerializationLookupService;
-import com.enragedginger.stephenerialization.StephenerializationService;
-import com.enragedginger.stephenerialization.annotations.Stephenerializable;
-import com.enragedginger.stephenerialization.annotations.Stephenerialize;
+import static data.ReprUtil.repr;
 
 @Stephenerializable(version = 20121225)
 public class Image implements java.io.Serializable
@@ -125,7 +123,7 @@ public class Image implements java.io.Serializable
      * @param streamer The output stream to use.
      */
     private void writeObject(ObjectOutputStream streamer) {
-        ImageStephenerializer.stephenerialize(this, streamer);
+        //ImageStephenerializer.stephenerialize(this, streamer);
         /*final StephenerializationService service = StephenerializationLookupService.lookup();
         service.stephenerialize(this, streamer, Image.class);*/
     }
@@ -135,7 +133,7 @@ public class Image implements java.io.Serializable
      * @param streamer The input stream to use.
      */
     private void readObject(ObjectInputStream streamer) {
-        ImageStephenerializer.destephenerialize(this, streamer);
+        //ImageStephenerializer.destephenerialize(this, streamer);
         /*final StephenerializationService service = StephenerializationLookupService.lookup();
         service.destephenerialize(this, streamer, Image.class);*/
     }

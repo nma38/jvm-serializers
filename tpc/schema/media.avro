@@ -23,7 +23,11 @@
         {"name": "bitrate", "type": ["null", "int"]},
         {"name": "persons", "type": {"type": "array", "items": "string"}},
         {"name": "player", "type": "int"},
-        {"name": "copyright", "type": ["null", "string"]}
+        {"name": "copyright", "type": ["null", "string"]},
+        {"name": "pods", "type": {"type": "array", "items": {"type": "record", "name": "Pod", "fields": [
+            {"name": "message", "type": "string"},
+            {"name": "pod", "type": "Pod"}
+            ]}}}
       ]
     }
   }

@@ -84,9 +84,10 @@ public abstract class MediaItemBenchmark extends BenchmarkBase
             {
                     byte[] array = serializer.serialize(transformer.forward(value));
                     long start = System.nanoTime();
+                    Object[] objects = new Object[iterations];
                     for (int i = 0; i < iterations; i++)
                     {
-                            serializer.deserialize(array);
+                            objects[i] = transformer.reverse(serializer.deserialize(array));
                     }
                     return iterationTime(System.nanoTime() - start, iterations);
             }

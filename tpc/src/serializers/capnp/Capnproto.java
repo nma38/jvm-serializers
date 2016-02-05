@@ -125,7 +125,7 @@ public class Capnproto {
 
             StructList.Builder<MediaContentHolder.Image.Builder> images = mediaContentBuilder.initImage(mediaContent.getImages().size());
             for (int i = 0; i < mediaContent.getImages().size(); i++) {
-                MediaContentHolder.Image.Builder imageBuilder = images.get(0);
+                MediaContentHolder.Image.Builder imageBuilder = images.get(i);
                 forwardImage(mediaContent.getImages().get(i), imageBuilder);
             }
 
@@ -159,6 +159,7 @@ public class Capnproto {
             if (media.getFormat() != null) {
                 mediaBuilder.setFormat(media.getFormat());
             }
+
             mediaBuilder.setHeight(media.getHeight());
             mediaBuilder.setWidth(media.getWidth());
             mediaBuilder.setSize(media.getSize());
@@ -207,11 +208,11 @@ public class Capnproto {
             }
             // Media
             return new data.media.Media(
-                    media.getUri().toString(),
+                    media.hasUri()? media.getUri().toString() : null,
                     media.hasTitle() ? media.getTitle().toString() : null,
                     media.getWidth(),
                     media.getHeight(),
-                    media.getFormat().toString(),
+                    media.hasFormat()? media.getFormat().toString() : null,
                     media.getDuration(),
                     media.getSize(),
                     media.getBitrate(),
@@ -256,7 +257,7 @@ public class Capnproto {
         private data.media.Image reverseImage(MediaContentHolder.Image.Reader image)
         {
             return new data.media.Image(
-                    image.getUri().toString(),
+                    image.hasUri() ? image.getUri().toString() : null,
                     image.hasTitle() ? image.getTitle().toString() : null,
                     image.getWidth(),
                     image.getHeight(),

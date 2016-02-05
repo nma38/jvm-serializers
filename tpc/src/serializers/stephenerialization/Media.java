@@ -1,13 +1,11 @@
 package serializers.stephenerialization;
 
+import com.enragedginger.stephenerialization.annotations.Stephenerializable;
+import com.enragedginger.stephenerialization.annotations.Stephenerialize;
+
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
-
-import com.enragedginger.stephenerialization.StephenerializationLookupService;
-import com.enragedginger.stephenerialization.StephenerializationService;
-import com.enragedginger.stephenerialization.annotations.Stephenerializable;
-import com.enragedginger.stephenerialization.annotations.Stephenerialize;
 
 import static data.ReprUtil.repr;
 
@@ -239,7 +237,7 @@ public class Media implements java.io.Serializable {
      * @param streamer The output stream to use.
      */
     private void writeObject(ObjectOutputStream streamer) {
-        MediaStephenerializer.stephenerialize(this, streamer);
+        //MediaStephenerializer.stephenerialize(this, streamer);
         /*final StephenerializationService service = StephenerializationLookupService.lookup();
         service.stephenerialize(this, streamer, Media.class);*/
     }
@@ -249,7 +247,7 @@ public class Media implements java.io.Serializable {
      * @param streamer The input stream to use.
      */
     private void readObject(ObjectInputStream streamer) {
-        MediaStephenerializer.destephenerialize(this, streamer);
+        //MediaStephenerializer.destephenerialize(this, streamer);
         /*final StephenerializationService service = StephenerializationLookupService.lookup();
         service.destephenerialize(this, streamer, Media.class);*/
     }

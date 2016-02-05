@@ -11,6 +11,11 @@ module shared {
     }
 }
 module full {
+    value PodFull {
+        String message;
+        PodFull pod;
+    }
+
     value ImageFull {
         String uri;
         String? title;
@@ -31,6 +36,7 @@ module full {
         List<String> persons;
         shared.Player player;
         String? copyright;
+        List<PodFull> pods;
         //external name Java 'data.media.Media';
     }
     value MediaContentFull {
@@ -40,6 +46,10 @@ module full {
     }
 }
 module minified {
+    value PodMinified {
+        String message { serialization name m; }
+        PodMinified pod { serialization name p; }
+    }
     value ImageMinified {
         String uri { serialization name u; }
         String? title { serialization name t; }
@@ -60,6 +70,7 @@ module minified {
         List<String> persons { serialization name p; }
         shared.Player player { serialization name l; }
         String? copyright { serialization name c; }
+        List<PodMinified> pods { serialization name n; }
         //external name Java 'data.media.Media';
     }
     value MediaContentMinified {

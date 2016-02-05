@@ -1,13 +1,11 @@
 package serializers.stephenerialization;
 
+import com.enragedginger.stephenerialization.annotations.Stephenerializable;
+import com.enragedginger.stephenerialization.annotations.Stephenerialize;
+
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
-
-import com.enragedginger.stephenerialization.StephenerializationLookupService;
-import com.enragedginger.stephenerialization.StephenerializationService;
-import com.enragedginger.stephenerialization.annotations.Stephenerializable;
-import com.enragedginger.stephenerialization.annotations.Stephenerialize;
 
 @Stephenerializable(version = 20121225)
 public class MediaContent implements java.io.Serializable
@@ -79,7 +77,7 @@ public class MediaContent implements java.io.Serializable
      * @param streamer The output stream to use.
      */
     private void writeObject(ObjectOutputStream streamer) {
-        MediaContentStephenerializer.stephenerialize(this, streamer);
+        //MediaContentStephenerializer.stephenerialize(this, streamer);
         /*final StephenerializationService service = StephenerializationLookupService.lookup();
         service.stephenerialize(this, streamer, MediaContent.class);*/
     }
@@ -89,7 +87,7 @@ public class MediaContent implements java.io.Serializable
      * @param streamer The input stream to use.
      */
     private void readObject(ObjectInputStream streamer) {
-        MediaContentStephenerializer.destephenerialize(this, streamer);
+        //MediaContentStephenerializer.destephenerialize(this, streamer);
         /*final StephenerializationService service = StephenerializationLookupService.lookup();
         service.destephenerialize(this, streamer, MediaContent.class);*/
     }

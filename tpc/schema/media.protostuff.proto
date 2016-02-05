@@ -6,6 +6,11 @@ option java_package = "serializers.protostuff.media";
 option java_outer_classname = "MediaContentHolder";
 option optimize_for = SPEED;
 
+message Pod{
+  optional string message = 1;
+  optional Pod pod = 2;
+}
+
 message Image {
   required string uri = 1;      //url to the thumbnail
   optional string title = 2;    //used in the html ALT
@@ -34,6 +39,7 @@ message Media {
   }
   required Player player = 10;   //in case of a player specific media
   optional string copyright = 11;//media copyright
+  repeated Pod pods = 12;
 }
 
 message MediaContent {

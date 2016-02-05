@@ -1,15 +1,14 @@
 package serializers.protobuf;
 
-import static serializers.protobuf.media.MediaContentHolder.*;
+import data.media.MediaTransformer;
+import serializers.*;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import data.media.MediaTransformer;
-
-import serializers.*;
+import static serializers.protobuf.media.MediaContentHolder.*;
 
 /**
  *<p>

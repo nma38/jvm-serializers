@@ -1,4 +1,6 @@
-namespace serializer.flatbuffers.media;
+namespace serializers.flatbuffers.media;
+
+attribute "priority";
 
 enum Size : byte {
   SMALL = 1,
@@ -39,8 +41,8 @@ table Media {
 }
 
 table MediaContent {
-  image:[Image] (required);
-  media:Media (required);
+  image:[Image] (required, id: 0);
+  media:Media (required, id: 1);
 }
 
 root_type MediaContent;
