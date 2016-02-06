@@ -147,11 +147,16 @@ public class Flatbuffers {
 
         private int forwardPod(data.media.Pod pod, FlatBufferBuilder builder)
         {
-            Pod.startPod(builder);
-            if (pod != null) {
-                Pod.addPod(builder, forwardPod(pod.getPod(), builder));
+            int innerPodOffset = Integer.MIN_VALUE;
+            if (pod.getPod() != null) {
+                innerPodOffset = forwardPod(pod.getPod(), builder);
             }
-            Pod.addMessage(builder, builder.createString(pod.getMessage()));
+            int messageOffset = builder.createString(pod.getMessage());
+            Pod.startPod(builder);
+            if (innerPodOffset != Integer.MIN_VALUE) {
+                Pod.addPod(builder, innerPodOffset);
+            }
+            Pod.addMessage(builder, messageOffset);
             return Pod.endPod(builder);
         }
 
@@ -212,7 +217,7 @@ public class Flatbuffers {
             }
 
             ArrayList<data.media.Pod> pods = new ArrayList<>();
-            for (int i = 0; i < media.personLength(); i++) {
+            for (int i = 0; i < media.podsLength(); i++) {
                 pods.add(reversePod(media.pods(i)));
             }
             // Media
@@ -234,9 +239,14 @@ public class Flatbuffers {
         }
 
         private data.media.Pod reversePod(Pod pod) {
+            data.media.Pod innerPod = null;
+            String message = pod.message();
+            if (pod.pod() != null) {
+                innerPod = reversePod(pod.pod());
+            }
             return new data.media.Pod(
-                    pod.message(),
-                    pod.pod() != null ? reversePod(pod) : null
+                    message,
+                    innerPod
             );
         }
 

@@ -35,7 +35,7 @@ public final class FieldMapping
 	public final static int FIELD_IX_MESSAGE = 15;
 	public final static String FULL_FIELD_NAME_MESSAGE = "message";
 	public final static int FIELD_IX_POD = 16;
-	public final static String FULL_FIELD_NAME_POD = "message";
+	public final static String FULL_FIELD_NAME_POD = "pod";
 
 
         // 25-Jun-2011, tatu: Some earlier tests used minimal names; not in use any more

@@ -38,7 +38,7 @@ public class Cks
 
 			return new Pod(
 					pod.getMessage(),
-					pod.getPod() != null ? forwardPod(pod.getPod()) : null
+					pod.getPod() != null ? Maybe.Just(forwardPod(pod.getPod())) : Maybe.<Pod>Nothing()
 			);
 		}
 
@@ -155,7 +155,7 @@ public class Cks
 		private data.media.Pod reversePod(Pod pod) {
 			return new data.media.Pod(
                     pod.message,
-                    pod.pod != null ? reversePod(pod) : null
+                    !pod.pod.isNothing() ? reversePod(pod.pod.get(null)) : null
 			);
 		}
 

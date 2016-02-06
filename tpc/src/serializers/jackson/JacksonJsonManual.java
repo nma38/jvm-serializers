@@ -171,7 +171,10 @@ public class JacksonJsonManual extends BaseJacksonDriver<MediaContent>
         for (String person : media.persons) {
             generator.writeString(person);
         }
+        generator.writeEndArray();
+
         generator.writeFieldName(FIELD_PODS);
+        generator.writeStartArray();
         for (Pod pod : media.pods) {
             writePod(generator, pod);
         }
@@ -186,6 +189,8 @@ public class JacksonJsonManual extends BaseJacksonDriver<MediaContent>
         generator.writeFieldName(FIELD_POD);
         if (pod.getPod() != null) {
             writePod(generator, pod.getPod());
+        } else {
+            generator.writeNull();
         }
         generator.writeEndObject();
     }
@@ -355,8 +360,9 @@ public class JacksonJsonManual extends BaseJacksonDriver<MediaContent>
                 case FIELD_IX_COPYRIGHT:
                     media.copyright = parser.nextTextValue();
                     continue;
-                    case FIELD_IX_PODS:
-                        media.pods = readPods(parser);
+                case FIELD_IX_PODS:
+                    media.pods = readPods(parser);
+                    continue;
                 }
             }
             throw new IllegalStateException("Unexpected field '"+field+"'");
@@ -376,25 +382,12 @@ public class JacksonJsonManual extends BaseJacksonDriver<MediaContent>
         return media;
     }
 
-    private List<Pod> readPods(JsonParser parser) throws IOException
-    {
-        if (parser.nextToken() != JsonToken.START_ARRAY) {
-            reportIllegal(parser, JsonToken.START_ARRAY);
-        }
-        List<Pod> pods = new ArrayList<>();
-        while (parser.nextToken() == JsonToken.START_OBJECT) {
-            pods.add(readPod(parser));
-        }
-        verifyCurrent(parser, JsonToken.END_ARRAY);
-        return pods;
-    }
-
     private Pod readPod(JsonParser parser) throws IOException {
         Pod pod = new Pod();
         if (parser.nextFieldName(FIELD_MESSAGE)) {
             pod.message = parser.nextTextValue();
             if (parser.nextFieldName(FIELD_POD)) {
-                pod.pod = parser.getCurrentToken() != JsonToken.VALUE_NULL ? readPod(parser) : null;
+                pod.pod = parser.nextToken() != JsonToken.VALUE_NULL ? readPod(parser) : null;
                 parser.nextToken();
                 verifyCurrent(parser, JsonToken.END_OBJECT);
                 return pod;
@@ -450,8 +443,23 @@ public class JacksonJsonManual extends BaseJacksonDriver<MediaContent>
         }
         verifyCurrent(parser, JsonToken.END_ARRAY);
         return persons;
-    }                
-    
+    }
+
+
+    private List<Pod> readPods(JsonParser parser) throws IOException
+    {
+        if (parser.nextToken() != JsonToken.START_ARRAY) {
+            reportIllegal(parser, JsonToken.START_ARRAY);
+        }
+        List<Pod> pods = new ArrayList<>();
+        while (parser.nextToken() == JsonToken.START_OBJECT) {
+            pods.add(readPod(parser));
+        }
+        verifyCurrent(parser, JsonToken.END_ARRAY);
+        return pods;
+    }
+
+
     private Image readImage(JsonParser parser) throws IOException
     {
         boolean haveWidth = false;

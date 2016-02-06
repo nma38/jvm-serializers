@@ -50,7 +50,7 @@ public class Pod  implements java.io.Serializable {
         Pod pod = (Pod) o;
 
         if (message != null ? !message.equals(pod.message) : pod.message != null) return false;
-        if (pod != null ? !pod.equals(pod.pod) : pod.pod != null) return false;
+        if (this.pod != null ? !this.pod.equals(pod.pod) : pod.pod != null) return false;
 
         return true;
     }

@@ -250,7 +250,7 @@ public class Thrift
 			private data.media.Pod reversePod(Pod pod) {
 				return new data.media.Pod(
 						pod.getMessage(),
-						pod.getPod() != null ? reversePod(pod) : null
+						pod.isSetPod() ? reversePod(pod.getPod()) : null
 				);
 
 			}

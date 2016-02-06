@@ -99,10 +99,7 @@ public class Protobuf
 
 		private Media forwardMedia(data.media.Media media)
 		{
-			ArrayList<Pod> pods = new ArrayList<>();
-			for (data.media.Pod pod : media.getPods()) {
-				pods.add(forwardPod(pod));
-			}
+
 
 			// Media
 			Media.Builder mb = Media.newBuilder();
@@ -119,6 +116,9 @@ public class Protobuf
 			}
 			mb.setPlayer(forwardPlayer(media.player));
 			if (media.copyright != null) mb.setCopyright(media.copyright);
+			for (data.media.Pod pod : media.getPods()) {
+				mb.addPods(forwardPod(pod));
+			}
 
 			return mb.build();
 		}
@@ -205,7 +205,7 @@ public class Protobuf
 		private data.media.Pod reversePod(Pod pod) {
 			return new data.media.Pod(
 				pod.getMessage(),
-				pod.getPod() != null ? reversePod(pod) : null
+				pod.hasPod() ? reversePod(pod.getPod()) : null
 			);
 		}
 

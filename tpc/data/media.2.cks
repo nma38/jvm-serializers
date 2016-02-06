@@ -13,6 +13,24 @@
 		Persons = ["Bill Gates, Jr.", "Steven Jobs"]
 		Player = Flash
 		Copyright = Set: "2009, Scooby Doo"
+		Pods = [
+		    {
+                Message = "root3"
+                Pod = Set: {
+                    Message = "root3-child1"
+                    Pod = Set: {
+                        Message = "root3-child2"
+                        Pod = Set: {
+                            Message = "root3-child3"
+                            Pod = Set: {
+                                Message = "root3-child4"
+                                Pod = None
+                            }
+                        }
+                    }
+                }
+            }
+		]
 	}
 
 	Images = [
